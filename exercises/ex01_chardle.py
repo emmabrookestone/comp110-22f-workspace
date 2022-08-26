@@ -18,7 +18,7 @@ print("Searching for " + character + " in " + first_word)
 if character == first_word[0]:
     print(character + " is found at index 0 ")
     count += 1 
-if character == first_word[1]: 
+if character == first_word[1]:
     print(character + " is found at index 1 ")
     count += 1
 if character == first_word[2]:
@@ -27,13 +27,13 @@ if character == first_word[2]:
 if character == first_word[3]:
     print(character + " is found at index 3 ")
     count += 1
-if character == first_word[4]: 
+if character == first_word[4]:
     print(character + " is found at index 4 ")
     count += 1
 
 if count == 1:
-    print(1 + " instance of " + character + " in " + first_word)
+    print(str(count) + " instance of " + character + " found in " + first_word)
 if count > 1:
-    print(f"{count} instances of {character} in {first_word}")
-if character == 0:
-    print("No instances of " + character + " in " + first_word)
+    print(f"{count} instances of {character} found in {first_word}")
+if count == 0:
+    print("No instances of " + count + " found in " + first_word)
