@@ -13,4 +13,4 @@ def spread_love(to: str, n: int) -> str:
         love_note += love(to) + "\n"
         counter += 1
     return love_note
-''
+'

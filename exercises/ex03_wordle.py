@@ -2,10 +2,62 @@
 
 __author__ = 730544721
 
-def contains_char(search_string: str, single_character: str) -> bool:
+
+def contains_char(search: str, single_character: str) -> bool:
     """Will return True if single character is found at any index and return False if not."""
     assert len(single_character) == 1
-    if len(single_character) == 1:
-        return{True}
-    else:
-        return{False}
+    count: int = 0
+    while count < len(search):
+        if search[count] == single_character:
+            return True
+        count += 1
+    return False
+
+def emojified(guess: str, secret: str) -> str:
+    """Will return an emoji if the two strings are the same length and where the variable is."""
+    assert len(guess) == len(secret)
+    WHITE_BOX: str = "\U00002B1C"
+    YELLOW_BOX: str = "\U0001F7E8"
+    GREEN_BOX: str = "\U0001F7E9"
+    result: str = ""
+    count: int = 0
+    while count < len(secret):
+        if guess[count] == secret[count]:
+            result += GREEN_BOX
+        else:
+            x: bool = contains_char(secret, guess[count])
+            if x is True:
+                result += YELLOW_BOX
+            else:
+                result += WHITE_BOX
+        count += 1
+    return result
+
+def input_guess(e: int) -> str:
+    """Will tell user to provide a guess of expected length and do so until did."""
+    guess: str = input(f"Enter a {e} character word:")
+    while len(guess) != e:
+        guess = input(f"That wasn't {e} chars! Try again:")
+        if len(guess) == e:
+            return guess
+
+
+def main() -> None:
+    """The entrypoint of the program and main game loop."""
+    secret_word: str = "codes"
+    count: int = 0
+    tries: int = 1
+    x: bool = False
+    while tries <= 6 and x:
+        print(f"=== Turn {tries}/6 ===")
+        guess = input_guess(len(secret_word))
+        print(emojified(guess, secret_word))
+        if guess == secret_word:
+            print(f"You won {tries}/6 turns!")
+            not x
+        else:
+            print("X/6 - Sorry, try again tomorrow!")
+            tries += 1
+
+if __name__ == "__main__":
+    main()
