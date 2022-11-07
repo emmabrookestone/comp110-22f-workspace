@@ -6,7 +6,7 @@ from exercises.ex09 import constants
 from math import sin, cos, pi
 
 
-__author__ = ""  # TODO
+__author__ = "730544721"
 
 
 class Point:
@@ -37,15 +37,64 @@ class Cell:
         self.location = location
         self.direction = direction
 
-    # Part 1) Define a method named `tick` with no parameters.
-    # Its purpose is to reassign the object's location attribute
-    # the result of adding the self object's location with its
-    # direction. Hint: Look at the add method.
-        
+    def contract_disease(self) -> None:
+        """Assign sickness to INFECTED."""
+        self.sickness = constants.INFECTED
+
+    def is_vulnerable(self) -> bool:
+        """Returns True when the cell's sickness attribute is False."""
+        outcome: bool
+        if self.sickness == constants.VULNERABLE:
+            outcome = True
+        else:
+            outcome = False
+        return outcome
+
+    def is_infected(self) -> bool:
+        """Returns true if the cell's sickness is equal to INFECTED"""
+        result: bool
+        if self.sickness == constants.INFECTED:
+            result = True
+        else: 
+            result = False
+        return result
+
+    def tick(self) -> None:
+        """Update the state of the simulation by one time step."""
+        self.location = self.location.add(self.direction)
+        if self.is_infected:
+            self.sickness += 1
+        if self.sickness > constants.RECOVERY_PERIOD:
+            self.sickness = Cell.immunize
+
     def color(self) -> str:
         """Return the color representation of a cell."""
-        return "black"
+        color_of_cell: str = " "
+        if self.is_vulnerable() is True:
+            return "gray"
+        elif self.is_infected() is True:
+            return "purple"
+        else:
+            color_of_cell = "red"
+        if self.is_immune() is True:
+            return "yellow"
+        return color_of_cell
+    
+    def contact_with(self, another: Cell) -> None:
+        """If an infected cell comes in contact another cell it will make it infected."""
+        if self.is_infected() and another.is_vulnerable() is True:
+            another.contract_disease
+        if self.is_vulnerable() and another.is_infected() is True:
+            self.contract_disease
 
+    def immunize() -> None:
+        """Will assign constant Immune to the sickness attribute of the Cell."""
+        constants.IMMUNE = Cell.sickness
+    
+    def is_immune() -> None:
+        """Will assign is Immune to a cell sickness attribute if it is equal to the Immune Constant."""
+        if Cell.sickness == constants.IMMUNE:
+            return True
 
 class Model:
     """The state of the simulation."""
@@ -53,28 +102,69 @@ class Model:
     population: list[Cell]
     time: int = 0
 
-    def __init__(self, cells: int, speed: float):
+    def __init__(self, cells: int, speed: float, infected_count: int):
         """Initialize the cells with random locations and directions."""
         self.population = []
+        if infected_count >= cells or infected_count == 0 or infected_count < 0:
+            raise ValueError("Number of infected cells must be at least one and less than the population of cells.")
+        for _ in range(cells):
+            start_location: Point = self.random_location()
+            start_direction: Point = self.random_direction()
+            cell: Cell(start_location, start_direction)
+            self.population.append(cell)
+            for i in range(infected_count):
+                self.population[i].contract_disease
     
     def tick(self) -> None:
         """Update the state of the simulation by one time step."""
         self.time += 1
+        self.time += 1
+        for cell in self.population:
+            cell.tick()
+            self.enforce_bounds(cell)
+        self.check_contacts()
 
     def random_location(self) -> Point:
         """Generate a random location."""
-        # TODO
-        return Point(0.0, 0.0)
+        start_x: float = random() * constants.BOUNDS_WIDTH - constants.MAX_X
+        start_y: float = random() * constants.BOUNDS_HEIGHT - constants.MAX_Y
+        return Point(start_x, start_y)
 
     def random_direction(self, speed: float) -> Point:
         """Generate a 'point' used as a directional vector."""
-        # TODO
-        return Point(0.0, 0.0)
+        random_angle: float = 2.0 * pi * random()
+        direction_x: float = cos(random_angle) * speed
+        direction_y: float = sin(random_angle) * speed
+        return Point(direction_x, direction_y)
 
     def enforce_bounds(self, cell: Cell) -> None:
         """Cause a cell to 'bounce' if it goes out of bounds."""
-        ...
+        if cell.location.x > constants.MAX_X:
+            cell.location.x = constants.MAX_X
+            cell.direction.x *= -1.0
+        if cell.location.x > constants.MIN_X:
+            cell.location.x = constants.MIN_X
+            cell.direction.x *= -1.0
+        if cell.location.x > constants.MAX_Y:
+            cell.location.x = constants.MAX_Y
+            cell.direction.x *= -1.0
+        if cell.location.x > constants.MIN_Y:
+            cell.direction.x *= -1.0
 
     def is_complete(self) -> bool:
         """Method to indicate when the simulation is complete."""
-        return False
+        complete: bool 
+        if self.is_vulnerable() or self.is_immune() is True:
+            complete = True
+        if self.is_infected is True:
+            complete = False
+        return complete
+
+    def check_contacts(self) -> None:
+        """Will check if two cell values come in contact with one another."""
+        for i in range(len(self.population)):
+            for x in range(i + 1, self.population):
+                cell1: Cell = self.population[i]
+                cell2: Cell = self.population[x]
+                if cell1.location.distance(cell2.location) < constants.CELL_RADIUS:
+                    cell1.contact_with(cell2)
